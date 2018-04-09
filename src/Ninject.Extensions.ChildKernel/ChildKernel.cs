@@ -17,17 +17,16 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Ninject.Activation;
+using Ninject.Activation.Caching;
+using Ninject.Modules;
+using Ninject.Selection.Heuristics;
+using Ninject.Syntax;
+// ReSharper disable UnusedMember.Global
+
 namespace Ninject.Extensions.ChildKernel
 {
-    using System;
-    using System.Collections.Generic;
-    using Ninject;
-    using Ninject.Activation;
-    using Ninject.Activation.Caching;
-    using Ninject.Modules;
-    using Ninject.Selection.Heuristics;
-    using Ninject.Syntax;
-
     /// <summary>
     /// This is a kernel with a parent kernel. Any binding that can not be resolved by this kernel is forwarded to the
     /// parent.
@@ -37,7 +36,7 @@ namespace Ninject.Extensions.ChildKernel
         /// <summary>
         /// The parent kernel.
         /// </summary>
-        private readonly IResolutionRoot parent;
+        private readonly IResolutionRoot _parent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildKernel"/> class.
@@ -47,15 +46,15 @@ namespace Ninject.Extensions.ChildKernel
         public ChildKernel(IResolutionRoot parent, params INinjectModule[] modules)
             : base(modules)
         {
-            this.parent = parent;
+            _parent = parent;
             
-            this.Components.RemoveAll<IActivationCache>();
-            this.Components.Add<IActivationCache, ChildActivationCache>(); 
+            Components.RemoveAll<IActivationCache>();
+            Components.Add<IActivationCache, ChildActivationCache>(); 
           
-            this.Components.RemoveAll<IConstructorScorer>();
-            this.Components.Add<IConstructorScorer, ChildKernelConstructorScorer>();
+            Components.RemoveAll<IConstructorScorer>();
+            Components.Add<IConstructorScorer, ChildKernelConstructorScorer>();
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildKernel"/> class.
         /// </summary>
@@ -65,21 +64,15 @@ namespace Ninject.Extensions.ChildKernel
         public ChildKernel(IResolutionRoot parent, INinjectSettings settings, params INinjectModule[] modules)
             : base(settings, modules)
         {
-            this.parent = parent;
+            _parent = parent;
         }
 
         /// <summary>
         /// Gets the parent resolution root.
         /// </summary>
         /// <value>The parent  resolution root.</value>
-        public IResolutionRoot ParentResolutionRoot
-        {
-            get
-            {
-                return this.parent;
-            }
-        }
-        
+        public IResolutionRoot ParentResolutionRoot => _parent;
+
         /// <summary>
         /// Determines whether the specified request can be resolved.
         /// </summary>
@@ -89,7 +82,7 @@ namespace Ninject.Extensions.ChildKernel
         /// </returns>
         public override bool CanResolve(IRequest request)
         {
-            return base.CanResolve(request) || this.parent.CanResolve(request, true);
+            return base.CanResolve(request) || _parent.CanResolve(request, true);
         }
 
         /// <summary>
@@ -102,7 +95,7 @@ namespace Ninject.Extensions.ChildKernel
         /// </returns>
         public override bool CanResolve(IRequest request, bool ignoreImplicitBindings)
         {
-            return base.CanResolve(request, ignoreImplicitBindings) || this.parent.CanResolve(request, true);
+            return base.CanResolve(request, ignoreImplicitBindings) || _parent.CanResolve(request, true);
         }
 
         /// <summary>
@@ -120,9 +113,9 @@ namespace Ninject.Extensions.ChildKernel
                 return base.Resolve(request);
             }
 
-            if (this.parent.CanResolve(request, true))
+            if (_parent.CanResolve(request, true))
             {
-                return this.parent.Resolve(request);
+                return _parent.Resolve(request);
             }
 
             try
@@ -133,7 +126,7 @@ namespace Ninject.Extensions.ChildKernel
             {
                 try
                 {
-                    return this.parent.Resolve(request);
+                    return _parent.Resolve(request);
                 }
                 catch (ActivationException)
                 {

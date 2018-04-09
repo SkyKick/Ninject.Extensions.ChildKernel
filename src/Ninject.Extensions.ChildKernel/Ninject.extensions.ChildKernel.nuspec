@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>SkyKick.Ninject.Extensions.ChildKernel</id>
+    <version>$version</version>
+    <authors>Ninject Project Contributors, SkyKick</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/ninject/ninject.extensions.childkernel/raw/master/LICENSE.txt</licenseUrl>
+    <description>Ninject extension that allows child kernels to be defined.  SkyKick fork of Ninject.Extensions.ChildKernel to support Ninject 3.3</description>
+    <language>en-US</language>
+    <tags>Ninject ioc di ChildKernel SkyKick</tags>
+    <iconUrl>https://github.com/ninject/ninject/raw/master/logos/Ninject-Logo32.png</iconUrl>
+    <projectUrl>http://www.ninject.org</projectUrl>
+    <dependencies>
+      <dependency id="Ninject" version="3.3.0" />
+    </dependencies>
+  </metadata>
+</package>
