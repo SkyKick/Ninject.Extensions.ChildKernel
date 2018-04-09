@@ -17,23 +17,20 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using Ninject.Activation;
+using Ninject.Components;
+using Ninject.Infrastructure;
+using Ninject.Parameters;
+using Ninject.Planning.Bindings;
+using Ninject.Planning.Bindings.Resolvers;
+using Xunit;
+
 namespace Ninject.Extensions.ChildKernel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using FluentAssertions;
-
-    using Ninject.Activation;
-    using Ninject.Components;
-    using Ninject.Infrastructure;
-    using Ninject.Parameters;
-    using Ninject.Planning.Bindings;
-    using Ninject.Planning.Bindings.Resolvers;
-
-    using Xunit;
-    
     /// <summary>
     /// Tests the implementation of <see cref="ChildKernel"/>.
     /// </summary>
@@ -62,20 +59,20 @@ namespace Ninject.Extensions.ChildKernel
         /// <summary>
         /// The object under test.
         /// </summary>
-        private readonly IKernel testee;
+        private readonly IKernel _testee;
 
         /// <summary>
         /// The parent kernel.
         /// </summary>
-        private readonly IKernel parentKernel;
+        private readonly IKernel _parentKernel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildKernelTest"/> class.
         /// </summary>
         public ChildKernelTest()
         {
-            this.parentKernel = new StandardKernel();
-            this.testee = new ChildKernel(this.parentKernel);
+            _parentKernel = new StandardKernel();
+            _testee = new ChildKernel(_parentKernel);
         }
 
         /// <summary>
@@ -84,12 +81,12 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void DependenciesAreResolvedOnChildKernelIfPossible()
         {
-            this.parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
-            this.parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
-            this.testee.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ChildFooName);
-            this.testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
+            _parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
+            _parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
+            _testee.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ChildFooName);
+            _testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
 
-            var foo = this.testee.Get<IFoo>();
+            var foo = _testee.Get<IFoo>();
 
             foo.Name.Should().Be(ChildFooName);
             foo.Bar.Name.Should().Be(ChildBarName);
@@ -101,11 +98,11 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void DependenciesAreResolvedOnTheParentKernelIfMissing()
         {
-            this.parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
-            this.parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
-            this.testee.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ChildFooName);
+            _parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
+            _parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
+            _testee.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ChildFooName);
 
-            var foo = this.testee.Get<IFoo>();
+            var foo = _testee.Get<IFoo>();
 
             foo.Name.Should().Be(ChildFooName);
             foo.Bar.Name.Should().Be(ParentBarName);
@@ -118,10 +115,10 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void ParentKernelCannotAccessChildKernelObjects()
         {
-            this.parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
-            this.testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
+            _parentKernel.Bind<IFoo>().To<Foo>().WithConstructorArgument("name", ParentFooName);
+            _testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
 
-            Assert.Throws<ActivationException>(() => this.testee.Get<IFoo>());
+            Assert.Throws<ActivationException>(() => _testee.Get<IFoo>());
         }
 
         /// <summary>
@@ -130,10 +127,10 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void ObjectsThatAreActivatedOnParentAreNotActivatedAgain()
         {
-            this.parentKernel.Bind<Bar>().ToSelf().WithConstructorArgument("name", ParentBarName);
-            this.testee.Bind<IBar>().ToMethod(ctx => ctx.Kernel.Get<Bar>());
+            _parentKernel.Bind<Bar>().ToSelf().WithConstructorArgument("name", ParentBarName);
+            _testee.Bind<IBar>().ToMethod(ctx => ctx.Kernel.Get<Bar>());
 
-            var bar = this.testee.Get<IBar>();
+            var bar = _testee.Get<IBar>();
 
             bar.ActivationCount.Should().Be(1);
         }
@@ -141,10 +138,10 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void ImplicitBindingsAreResolvedOnChildKernel()
         {
-            this.parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
-            this.testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
+            _parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
+            _testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
 
-            var foo = this.testee.Get<Foo>(new ConstructorArgument("name", string.Empty));
+            var foo = _testee.Get<Foo>(new ConstructorArgument("name", string.Empty));
 
             foo.Bar.Name.Should().Be(ChildBarName);
         }
@@ -152,11 +149,11 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void ImplicitBindingsAreResolvedOnChildKernelEvenIfImplicitBindingExistsOnParent()
         {
-            this.parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
-            this.testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
+            _parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
+            _testee.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ChildBarName);
 
-            this.parentKernel.Get<Foo>(new ConstructorArgument("name", string.Empty));
-            var foo = this.testee.Get<Foo>(new ConstructorArgument("name", string.Empty));
+            _parentKernel.Get<Foo>(new ConstructorArgument("name", string.Empty));
+            var foo = _testee.Get<Foo>(new ConstructorArgument("name", string.Empty));
 
             foo.Bar.Name.Should().Be(ChildBarName);
         }
@@ -164,9 +161,9 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void ImplicitBindingsFallbackToParentIncaseTheChildCantResolve()
         {
-            this.parentKernel.Components.Add<IMissingBindingResolver, BarMissingBindingResolver>();
+            _parentKernel.Components.Add<IMissingBindingResolver, BarMissingBindingResolver>();
 
-            var bar = this.testee.Get<IBar>();
+            var bar = _testee.Get<IBar>();
 
             bar.Name.Should().Be("parent");
         }
@@ -174,20 +171,20 @@ namespace Ninject.Extensions.ChildKernel
         [Fact]
         public void SelectCorrectConstructorWhenBindingsAcrossKernels()
         {
-            this.parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
+            _parentKernel.Bind<IBar>().To<Bar>().WithConstructorArgument("name", ParentBarName);
 
-            var baz = this.testee.Get<Baz>();
+            var baz = _testee.Get<Baz>();
 
             baz.Bar.Should().NotBeNull();
         }
 
-        public class BarMissingBindingResolver : NinjectComponent, IMissingBindingResolver
+        private class BarMissingBindingResolver : NinjectComponent, IMissingBindingResolver
         {
-            private readonly IKernel kernel;
+            private readonly IKernel _kernel;
 
             public BarMissingBindingResolver(IKernel kernel)
             {
-                this.kernel = kernel;
+                _kernel = kernel;
             }
 
             public IEnumerable<IBinding> Resolve(Multimap<Type, IBinding> bindings, IRequest request)
@@ -195,7 +192,7 @@ namespace Ninject.Extensions.ChildKernel
                 if (request.Service == typeof(IBar))
                 {
                     var binding = new Binding(request.Service);
-                    var builder = new BindingBuilder<IBar>(binding, this.kernel, string.Empty);
+                    var builder = new BindingBuilder<IBar>(binding, _kernel, string.Empty);
                     builder.To<Bar>().WithConstructorArgument("name", "parent");
                     return new[] { binding };
                 }

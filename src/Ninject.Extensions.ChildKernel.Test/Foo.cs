@@ -12,20 +12,20 @@ namespace Ninject.Extensions.ChildKernel
         /// <param name="name">The name of the instance.</param>
         public Foo(IBar bar, string name)
         {
-            this.Bar = bar;
-            this.Name = name;
+            Bar = bar;
+            Name = name;
         }
 
         /// <summary>
         /// Gets the injected bar object.
         /// </summary>
         /// <value>The injected bar object.</value>
-        public IBar Bar { get; private set; }
+        public IBar Bar { get; }
 
         /// <summary>
         /// Gets the name of the instance.
         /// </summary>
         /// <value>The name of the instance.</value>
-        public string Name { get; private set; }
+        public string Name { get; }
     }
 }

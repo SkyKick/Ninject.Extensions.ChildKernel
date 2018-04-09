@@ -17,11 +17,11 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using Ninject.Activation.Caching;
+using Ninject.Components;
+
 namespace Ninject.Extensions.ChildKernel
 {
-    using Ninject.Activation.Caching;
-    using Ninject.Components;
-
     /// <summary>
     /// The activation cache of child kernels.
     /// </summary>
@@ -30,7 +30,7 @@ namespace Ninject.Extensions.ChildKernel
         /// <summary>
         /// The cache of the parent kernel.
         /// </summary>
-        private readonly IActivationCache parentCache;
+        private readonly IActivationCache _parentCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildActivationCache"/> class.
@@ -38,7 +38,7 @@ namespace Ninject.Extensions.ChildKernel
         /// <param name="kernel">The kernel.</param>
         public ChildActivationCache(IKernel kernel)
         {
-            this.parentCache = ((IChildKernel)kernel).ParentResolutionRoot.Get<IKernel>().Components.Get<IActivationCache>();
+            _parentCache = ((IChildKernel)kernel).ParentResolutionRoot.Get<IKernel>().Components.Get<IActivationCache>();
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Ninject.Extensions.ChildKernel
         /// <param name="instance">The instance to be added.</param>
         public void AddActivatedInstance(object instance)
         {
-            this.parentCache.AddActivatedInstance(instance);
+            _parentCache.AddActivatedInstance(instance);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Ninject.Extensions.ChildKernel
         /// <param name="instance">The instance to be added.</param>
         public void AddDeactivatedInstance(object instance)
         {
-            this.parentCache.AddDeactivatedInstance(instance);
+            _parentCache.AddDeactivatedInstance(instance);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Ninject.Extensions.ChildKernel
         /// </returns>
         public bool IsActivated(object instance)
         {
-            return this.parentCache.IsActivated(instance);
+            return _parentCache.IsActivated(instance);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Ninject.Extensions.ChildKernel
         /// </returns>
         public bool IsDeactivated(object instance)
         {
-            return this.parentCache.IsDeactivated(instance);
+            return _parentCache.IsDeactivated(instance);
         }
     }
 }

@@ -17,10 +17,10 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
+using Ninject.Syntax;
+
 namespace Ninject.Extensions.ChildKernel
 {
-    using Ninject.Syntax;
-
     /// <summary>
     /// A kernel that has a parent for fall back.
     /// </summary>

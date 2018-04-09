@@ -11,8 +11,8 @@ namespace Ninject.Extensions.ChildKernel
         /// <param name="name">The name of the instance.</param>
         public Bar(string name)
         {
-            this.Name = name;
-            this.ActivationCount = 0;
+            Name = name;
+            ActivationCount = 0;
         }
 
         /// <summary>
@@ -25,14 +25,14 @@ namespace Ninject.Extensions.ChildKernel
         /// Gets the name of the instance.
         /// </summary>
         /// <value>The name of the instance.</value>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Initializes the instance. Called during activation.
         /// </summary>
         public void Initialize()
         {
-            this.ActivationCount++;
+            ActivationCount++;
         }
     }
 }
