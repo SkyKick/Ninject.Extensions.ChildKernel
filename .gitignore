@@ -17,3 +17,6 @@ _ReSharper.Ninject.Extensions.ChildKernel with Silverlight and WP7 Unittesting
 *.user
 obj
 /src/Ninject.Extensions.ChildKernel.SilverlightTests/Ninject.Extensions.ChildKernel.SilverlightTests.csproj.user
+.vs
+*.un
+*~
